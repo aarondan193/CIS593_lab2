@@ -1,0 +1,20 @@
+#Opens the prepped csv file
+with open (os.path.join(newpath,outfile), 'r') as f:
+    #hooks csv reader to file
+    reader = csv.reader(f)
+    #pulls out the columns (which match the SQL table)
+    columns = next(reader)
+    #trims any extra spaces
+    columns = [x.strip(' ') for x in columns]
+    #starts SQL statement
+    query = 'bulk insert into SpikeData123({0}) values ({1})'
+    #puts column names in SQL query 'query'
+    query = query.format(','.join(columns), ','.join('?' * len(columns)))
+
+    print 'Query is: %s' % query
+    #starts curser from cnxn (which works)
+    cursor = cnxn.cursor()
+    #uploads everything by row
+    for data in reader:
+        cursor.execute(query, data)
+        cursor.commit()
